@@ -1,10 +1,10 @@
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Main {
+public class Main2 {
   // mảng các ký tự đặc biệt liên quan đến các ký tự cách
   public static final List<Character> space = Arrays.asList('b', 'f', 'n', 'r', 't', '\'');
 
@@ -13,11 +13,16 @@ public class Main {
     try {
       String input = Files.readString(Paths.get("./src/input.vc"));
       StringBuilder temp = new StringBuilder();
-      StringBuilder output = new StringBuilder();
+      List<String> output = new ArrayList<>();
       StateMachine.state0.nextState(input, temp, output);
-      FileWriter outputFile = new FileWriter("./src/output.vctok");
-      outputFile.write(output.toString());
-      outputFile.close();
+      output = output.stream().filter(a -> !a.matches("[ \b\n\f\r\t]+")).toList();
+      for (String i : output) {
+        System.out.println(i);
+      }
+
+      //            FileWriter outputFile = new FileWriter("./src/output.vctok");
+      //            outputFile.write(output.toString());
+      //            outputFile.close();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -27,11 +32,10 @@ public class Main {
   private enum StateMachine {
     state0 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         // cuối file thì kết thúc
         if (line.isEmpty()) {
-          output.append('$');
+          output.add("$");
           return;
         }
         // Lấy character đầu tiên
@@ -90,7 +94,7 @@ public class Main {
             }
             // Check if white space (space, tab, ...)
             if (Character.isWhitespace(current)) {
-//              output.append(current);
+              output.add(String.valueOf(current));
               temp.setLength(0);
               state0.nextState(line, temp, output);
             } else {
@@ -103,8 +107,7 @@ public class Main {
 
     state1 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         switch (current) {
           case '.':
@@ -124,7 +127,7 @@ public class Main {
               state1.nextState(line, temp, output);
             } else {
               System.out.println("int_literal");
-              output.append(temp);
+              output.add(temp.toString());
               temp.setLength(0);
               state0.nextState(line, temp, output);
             }
@@ -134,8 +137,7 @@ public class Main {
 
     state2 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -149,8 +151,7 @@ public class Main {
 
     state3 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -171,8 +172,7 @@ public class Main {
 
     state4 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -183,7 +183,7 @@ public class Main {
             state4.nextState(line, temp, output);
           } else {
             System.out.println("float_literal");
-            output.append(temp).append("\n");
+            output.add(temp.toString());
             temp.setLength(0);
             state0.nextState(line, temp, output);
           }
@@ -193,8 +193,7 @@ public class Main {
 
     state5 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         if (Character.isDigit(current)) {
           temp.append(current);
@@ -202,7 +201,7 @@ public class Main {
           state5.nextState(line, temp, output);
         } else {
           System.out.println("float_literal");
-          output.append(temp).append("\n");
+          output.add(temp.toString());
           temp.setLength(0);
           state0.nextState(line, temp, output);
         }
@@ -211,8 +210,7 @@ public class Main {
 
     state6 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         if (Character.isDigit(current) || Character.isAlphabetic(current)) {
           temp.append(current);
@@ -220,7 +218,7 @@ public class Main {
           state6.nextState(line, temp, output);
         } else {
           System.out.println("identifier");
-          output.append(temp).append("\n");
+          output.add(temp.toString());
           temp.setLength(0);
           state0.nextState(line, temp, output);
         }
@@ -229,8 +227,7 @@ public class Main {
 
     state7 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         if (current == '*') {
           temp.append(current);
@@ -244,7 +241,7 @@ public class Main {
           state16.nextState(line, temp, output);
         } else {
           System.out.println("divide_operator");
-          output.append(temp).append("\n");
+          output.add(temp.toString());
           temp.setLength(0);
           state0.nextState(line, temp, output);
         }
@@ -253,8 +250,7 @@ public class Main {
 
     state8 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -262,7 +258,7 @@ public class Main {
           state21.nextState(line, temp, output);
         } else {
           System.out.println("op_greater");
-          output.append(temp).append("\n");
+          output.add(temp.toString());
           temp.setLength(0);
           state0.nextState(line, temp, output);
         }
@@ -271,8 +267,7 @@ public class Main {
 
     state9 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         if (current == '=') {
           temp.append(current);
@@ -280,7 +275,7 @@ public class Main {
           state22.nextState(line, temp, output);
         } else {
           System.out.println("op_assign");
-          output.append(temp).append("\n");
+          output.add(temp.toString());
           temp.setLength(0);
           state0.nextState(line, temp, output);
         }
@@ -289,8 +284,7 @@ public class Main {
 
     state10 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -298,7 +292,7 @@ public class Main {
           state23.nextState(line, temp, output);
         } else {
           System.out.println("op_less");
-          output.append(temp).append("\n");
+          output.add(temp.toString());
           temp.setLength(0);
           state0.nextState(line, temp, output);
         }
@@ -307,8 +301,7 @@ public class Main {
 
     state11 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -316,7 +309,7 @@ public class Main {
           state24.nextState(line, temp, output);
         } else {
           System.out.println("op_negative");
-          output.append(temp).append("\n");
+          output.add(temp.toString());
           temp.setLength(0);
           state0.nextState(line, temp, output);
         }
@@ -325,10 +318,9 @@ public class Main {
 
     state12 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("plus_operator");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -336,8 +328,7 @@ public class Main {
 
     state13 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -351,10 +342,9 @@ public class Main {
 
     state14 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("separator");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -362,8 +352,7 @@ public class Main {
 
     state15 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -381,8 +370,7 @@ public class Main {
 
     state16 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -396,8 +384,7 @@ public class Main {
 
     state17 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -411,10 +398,9 @@ public class Main {
 
     state18 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("minus_operator");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -422,8 +408,7 @@ public class Main {
 
     state19 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -437,8 +422,7 @@ public class Main {
 
     state20 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("comment_multiple_lines");
         temp.setLength(0);
         state0.nextState(line, temp, output);
@@ -447,10 +431,9 @@ public class Main {
 
     state21 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("op_greater_equal");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -458,10 +441,9 @@ public class Main {
 
     state22 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("op_equal");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -469,10 +451,9 @@ public class Main {
 
     state23 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("op_less_equal");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -480,10 +461,9 @@ public class Main {
 
     state24 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("op_different");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -491,10 +471,9 @@ public class Main {
 
     state25 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("multiply_operator");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -502,10 +481,9 @@ public class Main {
 
     state26 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("op_or");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -513,8 +491,7 @@ public class Main {
 
     state27 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -528,10 +505,9 @@ public class Main {
 
     state28 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("String_literal");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -539,8 +515,7 @@ public class Main {
 
     state29 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         char current = line.charAt(0);
         temp.append(current);
         line = line.substring(1);
@@ -554,10 +529,9 @@ public class Main {
 
     state30 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("op_and");
-        output.append(temp).append("\n");
+        output.add(temp.toString());
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
@@ -565,15 +539,14 @@ public class Main {
 
     state31 {
       @Override
-      public void nextState(String line, StringBuilder temp, StringBuilder output)
-          throws Exception {
+      public void nextState(String line, StringBuilder temp, List<String> output) throws Exception {
         System.out.println("comment_in_line");
         temp.setLength(0);
         state0.nextState(line, temp, output);
       }
     };
 
-    public abstract void nextState(String line, StringBuilder temp, StringBuilder output)
+    public abstract void nextState(String line, StringBuilder temp, List<String> output)
         throws Exception;
   }
 }

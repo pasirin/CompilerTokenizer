@@ -1,3 +1,4 @@
+12ba
 void
 main
 (
@@ -33,8 +34,7 @@ if
 (
 n
 <=
-0
-)
+0)
 putString
 (
 "The number should be positive.\n"
@@ -51,14 +51,12 @@ next
 =
 current
 =
-1
-;
+1;
 for
 (
 i
 =
-1
-;
+1;
 i
 <=
 n
@@ -67,8 +65,7 @@ i
 =
 i
 +
-1
-)
+1)
 {
 putString
 (
@@ -107,3 +104,4 @@ twoaway
 }
 }
 }
+$
